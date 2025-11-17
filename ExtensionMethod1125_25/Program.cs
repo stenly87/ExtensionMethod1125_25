@@ -21,13 +21,26 @@ public class Program
         Console.WriteLine(age);
         Console.WriteLine(json);
         Console.WriteLine(name);
+
         // вызов метода расширения как обычный статичный метод
         age = IamNotYourFatherExtension.GetAge(notYourFather);
         //new Program().Test();
         // string json = new Program().GetJson();
-        
+
         // куча полезным методов в коллекциях являются методами расширения
         // объявлены в классе Enumerable
+
+        Point point1 = new Point { X = 1, Y = 1 };
+        Point point2 = new Point { X = 2, Y = 2 };
+        // дурость, но теперь так можно
+        Line line = point1 & point2;
+        // дурость, но теперь так можно
+        Line test = (Line)point1;
+        // неявное преобразование
+        Line test1 = point1;
+
+        // если оператор + будет принимать и возвращать Point
+        point1 += point2;
     }
 }
 
@@ -42,6 +55,45 @@ public sealed class IamNotYourFather
     {
         Name = name;
         BirthDay = birthDay;
+    }
+}
+
+public class Line
+{ 
+    public Point Point1 { get; set; }
+    public Point Point2 { get; set; }
+}
+public class Point
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+
+    // внутри класса можно переопределить действие для стандартных операторов
+    // тем самым определив для них новые задачи
+    //public static Line operator +(Point start, Point end)
+    //{
+    //    return new Line { Point1 = start, Point2 = end };
+    //}
+
+    public static Point operator +(Point start, Point end)
+    {
+        return new Point { X = start.X + end.X, Y = start.Y + end.Y  };
+    }
+
+    public static Line operator &(Point start, Point end)
+    {
+        return new Line { Point1 = start, Point2 = end };
+    }
+
+    // преобразование типов (explicit - явное преобразование)
+    //public static explicit operator Line(Point point)
+    //{
+    //    return new Line { Point1 = point, Point2 = point };
+    //}
+    // преобразование типов (implicit - неявное преобразование)
+    public static implicit operator Line(Point point)
+    {
+        return new Line { Point1 = point, Point2 = point };
     }
 }
 
@@ -75,11 +127,15 @@ public static class JsonExtension
 public static class AnotherTestExtension
 {
     // метод расширения для всего через обобщения
-    public static string GetName<T>(this T obj)
+    public static string GetName<T>(this T obj) where T : class
     {
         return obj.ToString();
     }
 }
+
+
+
+
 
 
 /* унаследоваться нельзя
